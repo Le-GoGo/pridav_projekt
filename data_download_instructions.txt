@@ -1,0 +1,20 @@
+1. Najprv sme si inštalovali PubMedom ponúkanú utilitu EDirect a lokálne sme si stiahli archív PubMedu. (link)
+
+2. Vytvorili sme csv súbor s PMIDs článkov a ich dátumom publikácie:
+
+cat all_ids.txt |\
+fetch-pubmed |\
+xtract -strict -pattern PubmedArticle -tab "|" -sep " " -def "N/A" -element MedlineCitation/PMID PubDate/Year \
+> pmid_by_year.csv
+
+3. Preparsovali dáta do csv formátu:
+
+cat pmid_by_year.csv | awk '/\|(200[7-9]|201[0-9]|202[0-2])$/' | cut -d "|" -f1 |\
+fetch-pubmed |\
+xtract -strict -pattern PubmedArticle -tab "\t" -sep " " -def "N/A" -element MedlineCitation/PMID PubDate/Year PubDate/Month ArticleTitle \
+> data_2007_2022.csv;
+
+cat pmid_by_year.csv | awk '/\|(19[3-8][0-9]|1990)/' | cut -d "|" -f1 |\
+fetch-pubmed |\
+xtract -strict -pattern PubmedArticle -tab "\t" -sep " " -def "N/A" -element MedlineCitation/PMID PubDate/Year ArticleTitle \
+> data_1930_1990.csv;
